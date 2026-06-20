@@ -1,0 +1,16 @@
+romkatv/powerlevel10k
+
+ohmyzsh/ohmyzsh path:lib/key-bindings.zsh  # 按键绑定，确保按键正常
+ohmyzsh/ohmyzsh path:lib/correction.zsh  # 自动纠正
+
+# fpath表示这个插件的所在目录，追加到 Zsh 的 $fpath 环境变量数组里即可，不要执行
+zsh-users/zsh-completions kind:fpath  # 第三方现代命令补全扩展包
+# 扫描 $fpath 并生成 .zcompdump 缓存，正式激活所有补全功能
+ohmyzsh/ohmyzsh path:lib/completion.zsh  # 加载并初始化zsh的compinit补全系统
+
+ohmyzsh/ohmyzsh path:plugins/git
+ohmyzsh/ohmyzsh path:plugins/fzf
+
+agkozak/zsh-z kind:defer
+zsh-users/zsh-autosuggestions kind:defer
+zdharma-continuum/fast-syntax-highlighting kind:defer

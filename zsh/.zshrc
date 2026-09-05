@@ -19,16 +19,36 @@ setopt AUTO_PUSHD  # cd - 进入历史路径
 setopt PUSHD_IGNORE_DUPS  # 相同的历史路径去重
 
 # zsh插件管理器Antidote
-zsh_plugins=${ZDOTDIR:-$HOME}/.zsh_plugins
-[[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
+zsh_plugins="${ZDOTDIR:-$HOME}/.zsh_plugins"
+zsh_plugins_fpath="${zsh_plugins}.fpath.zsh"
+[[ -f "${zsh_plugins}.txt" ]] || touch "${zsh_plugins}.txt"
 # Lazy-load antidote from its functions directory.
-fpath=(${ZDOTDIR:-$HOME}/.antidote/functions $fpath)
+fpath=("${ZDOTDIR:-$HOME}/.antidote/functions" $fpath)
 autoload -Uz antidote
-if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
-  antidote bundle <${zsh_plugins}.txt >|${zsh_plugins}.zsh
+# 将 kind:fpath 条目单独生成并在 compinit 前加载；其余依赖 compdef 的插件稍后加载。
+if [[ ! "${zsh_plugins}.zsh" -nt "${zsh_plugins}.txt" || ! "${zsh_plugins_fpath}" -nt "${zsh_plugins}.txt" ]]; then
+  antidote bundle < <(awk '$0 !~ /^[[:space:]]*#/ && /kind:fpath/' "${zsh_plugins}.txt") >|"${zsh_plugins_fpath}"
+  antidote bundle < <(awk '$0 ~ /^[[:space:]]*#/ || !/kind:fpath/' "${zsh_plugins}.txt") >|"${zsh_plugins}.zsh"
 fi
-autoload -Uz compinit && compinit -u
-source ${zsh_plugins}.zsh
+source "${zsh_plugins_fpath}"
+
+# 补全缓存按 Zsh 版本隔离；仅在缓存缺失、插件清单变化或超过 24 小时时重建。
+zcompdump_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+[[ -d "${zcompdump_dir}" ]] || mkdir -p -- "${zcompdump_dir}"
+zcompdump="${zcompdump_dir}/zcompdump-${ZSH_VERSION}"
+autoload -Uz compinit
+() {
+  emulate -L zsh
+  # EXTENDED_GLOB 仅在此函数内生效，用于通过 mh+24 判断缓存年龄。
+  setopt EXTENDED_GLOB
+  if [[ ! -s "${zcompdump}" || "${zsh_plugins}.txt" -nt "${zcompdump}" || -n "${zcompdump}"(#qN.mh+24) ]]; then
+    compinit -i -d "${zcompdump}"  # 重建缓存，并忽略不安全的补全目录
+  else
+    compinit -C -d "${zcompdump}"  # 跳过检查，快速复用现有缓存
+  fi
+}
+# compinit 就绪后再加载运行时插件，确保其中的 compdef 调用可用。
+source "${zsh_plugins}.zsh"
 
 bindkey '^j' autosuggest-accept  # Ctrl + J：全额采纳
 bindkey '^g' forward-word  # Ctrl + G：逐词采纳
@@ -40,7 +60,7 @@ alias l="ls -a"
 alias ll="ls -alh"
 alias python='python3'
 alias pip='pip3'
-# alias py3='source ~/env/python_env/global-da/.venv/bin/activate'
+alias py3='source ~/env/python_env/global-da/.venv/bin/activate'
 alias fp='fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"'
 alias pon='export http_proxy=http://127.0.0.1:7897 https_proxy=http://127.0.0.1:7897 all_proxy=socks5://127.0.0.1:7897'
 alias poff='unset http_proxy https_proxy all_proxy'

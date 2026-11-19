@@ -1,0 +1,8 @@
+[init]
+	defaultBranch = main
+[core]
+	autocrlf = input
+[color]
+	ui = auto
+[include]
+	path = ~/.gitconfig.local

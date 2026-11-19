@@ -1,0 +1,27 @@
+{
+    "editor.fontFamily": "Consolas,monospace",
+    "workbench.colorTheme": "Light Modern",
+    "editor.fontSize": 19,
+    // === 资源管理器交互 ===
+    "explorer.confirmDelete": false,
+    "explorer.confirmPasteNative": false,
+    "explorer.confirmDragAndDrop": false,
+    "problems.decorations.enabled": false,
+    // === 编辑器体验 ===
+    // "editor.formatOnSave": true,
+    // "editor.codeActionsOnSave": {
+    //     "source.organizeImports": "explicit"
+    // },
+    // 彩色括号
+    "editor.guides.bracketPairs": true,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    // "editor.linkedEditing": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    // Java
+    "java.compile.nullAnalysis.mode": "automatic",
+    // 主题
+    "diffEditor.ignoreTrimWhitespace": false,
+    "workbench.tree.indent": 24,
+    "workbench.tree.renderIndentGuides": "always",
+    "markdown.preview.fontSize": 19
+}
